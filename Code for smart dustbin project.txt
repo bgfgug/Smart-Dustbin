@@ -1,0 +1,49 @@
+#include <Servo.h>
+
+const int trigPin = 9;
+const int echoPin = 10;
+const int servoPin = 6;// PWM Pin
+
+Servo myServo;
+long duration;
+int distance;
+
+void setup() {
+  myServo.attach(servoPin);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Trigger the ultrasonic sensor
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  // Read the echo pin
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * 0.034 / 2; // Calculate the distance in cm
+
+  Serial.print("Distance: ");
+  Serial.println(distance);
+
+  // Check if distance is less than 10 cm
+  if (distance < 10) {
+    openDustbin();
+    delay(3000); // Keep the dustbin open for 3 seconds
+    closeDustbin();
+  }
+
+  delay(500); // Wait for a bit before the next measurement
+}
+
+void openDustbin() {
+  myServo.write(90); // Open the dustbin
+}
+
+void closeDustbin() {
+  myServo.write(0); // Close the dustbin
+}
